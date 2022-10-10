@@ -1,0 +1,41 @@
+version: "3.7"
+
+services:
+  oracle-db:
+    image: oracleinanutshell/oracle-xe-11g:latest
+    ports:
+      - 1521:1521
+      - 5500:5500
+    volumes:
+      - oracle-storage:/u01/app/oracle
+#hostname: localhost
+#port: 49161
+#sid: xe
+#username: system
+#password: oracle
+  postgres:
+    image: postgres:14-alpine
+    volumes:
+      - postgres-storage:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: password
+  keycloak:
+    image: quay.io/keycloak/keycloak:19.0.3
+    command: start-dev
+    environment:
+      DB_VENDOR: POSTGRES
+      DB_ADDR: postgres
+      DB_DATABASE: keycloak
+      DB_USER: keycloak
+      DB_SCHEMA: public
+      DB_PASSWORD: password
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    ports:
+      - 9999:8080
+
+volumes:
+  oracle-storage:
+  postgres-storage:
